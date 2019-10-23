@@ -1,36 +1,134 @@
+# A mini-project which plots out operations vs arrayLength for BubbleSort, InsertionSort, and SelectionSort.
+import matplotlib.pyplot as plt
+import math
+import random
 
-You can use the [editor on GitHub](https://github.com/RyanChenM7/BasicSortingAlgorithms/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+# A reversed sorted list for testing the functionality of the sorting algorithms
+worst_case = list(range(1,11))[::-1]
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+count = 0
+# Make a function that adds one to count
+# Will show up everytime an elementary operation occurs
+def c():
+    global count
+    count += 1
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Optimised bubble sort from last assignment
+def bs_optimized(arr):
 
-```markdown
-Syntax highlighted code block
+    for i in range(len(arr)-1):
+        # The aforementioned boolean to keep track of swaps
+        flag = False; c()
 
-# Header 1
-## Header 2
-### Header 3
+        # Don't check the last i because they are guaranteed to be sorted already
+        for j in range(len(arr)-1-i):
+            c()
+            if arr[j] > arr[j+1]:
+                flag = True; c()
+                arr[j+1], arr[j] = arr[j], arr[j+1]; c()
+        
+        c()
+        if flag == False:
+            break; c()
 
-- Bulleted
-- List
+    c()
+    # Return sorted array
+    return arr
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
+# Selection Sort Implementation
+def select_sort(arr):
+    # The sorted segment will be constructed from the left side
 
-[Link](url) and ![Image](src)
-```
+    for i in range(len(arr)-1):
+    # Arbitrarily initialize min element index
+        min_index = i; c()
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+        # i will change the left-bound of the unsorted array
+        for j in range(i+1, len(arr)):
 
-### Jekyll Themes
+            # The standard way to find the minimum element in an array
+            c()
+            if arr[j] < arr[min_index]:
+                min_index = j; c()
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/RyanChenM7/BasicSortingAlgorithms/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+        # Move the min element to end of sorted segment
+        arr[i], arr[min_index] = arr[min_index], arr[i]; c()
 
-### Support or Contact
+    c();
+    # Return sorted array
+    return arr
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+
+# Insertion Sort Implementation
+def insert_sort(arr):
+    # We will be building our sorted segment from left to right
+    for i in range(1, len(arr)):
+        
+        temp = arr[i]; c()
+
+        # Begin our search for the spot to insert arr[i] 
+        j = i - 1; c()
+
+        # Stop when j hits 0, the left-bound of the array
+        while j >= 0:
+            # Swap it backwards until it's in the right spot 
+            c()
+            if temp >= arr[j]:
+                break
+
+            arr[j+1] = arr[j]; c()
+            j -= 1; c()
+
+        arr[j+1] = temp; (c)
+
+    # This usage of temp saves elementary moves; better than swapping repeatedly
+
+    c()
+    # Return sorted array
+    return arr
+
+
+# N is the max size of unsorted array
+N = 300
+
+# Now we grab our data and plot it three times
+sorting_functions = [bs_optimized, select_sort, insert_sort]
+titles = ["Bubble Sort", "Selection Sort", "Insertion Sort"]
+x_label = "Size of Unsorted Array"
+y_label = "Number of Operations"
+x_values = list(range(1, N+1))
+
+# We have coded in our titles, labels, and x_values.
+
+for index, f in enumerate(sorting_functions):
+
+    arr_sizes = list(range(1,N+1))
+    operations = []
+
+    for t in range(1,N+1):
+
+        # Reset elementary operations count
+        count = 0 
+
+        # Make a shuffled list of numbers
+        test = list(range(1,t+1))
+        random.shuffle(test)
+
+        f(test)
+
+        operations.append(count)
+
+    # Plot our data
+    fig = plt.figure()
+
+    plt.title(titles[index])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.plot(x_values, operations, label=titles[index], marker=".", color="blue")
+    plt.plot(x_values, [n**2 for n in x_values], label='O(n^2)', marker=".", color="red")
+    plt.legend(bbox_to_anchor=(1, 1))
+    #plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(titles[index] + '.png')
